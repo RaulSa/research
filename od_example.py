@@ -6,6 +6,7 @@ import tarfile
 import tensorflow as tf
 import zipfile
 import cv2
+import time
 
 from collections import defaultdict
 from io import StringIO
@@ -14,12 +15,14 @@ from PIL import Image
 from utils import label_map_util
 from utils import visualization_utils as vis_util
 
+elapsedTime = 0
+
 # Define the video stream
 cap = cv2.VideoCapture("security-footage-people-walking-in.mp4")  # Change only if you have more than one webcams
 
 # What model to download.
 # Models can bee found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
-MODEL_NAME = 'ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03'
+MODEL_NAME = 'ssd_resnet50_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03'
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 
@@ -66,12 +69,14 @@ def load_image_into_numpy_array(image):
     return np.array(image.getdata()).reshape(
         (im_height, im_width, 3)).astype(np.uint8)
 
+i=0
+fpstot = 0.0
 
 # Detection
 with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
         while True:
-
+            t1 = time.time()
             # Read frame from camera
             ret, image_np = cap.read()
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
@@ -107,3 +112,9 @@ with detection_graph.as_default():
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
+            
+            elapsedTime = time.time() - t1
+            i+=1
+            if i < 200:
+                fpstot += 1/elapsedTime
+                print('fps promedio: ', fpstot/i)
