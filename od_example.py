@@ -15,7 +15,7 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 # Define the video stream
-cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
+cap = cv2.VideoCapture("security-footage-people-walking-in.mp4")  # Change only if you have more than one webcams
 
 # What model to download.
 # Models can bee found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
